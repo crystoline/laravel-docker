@@ -1,0 +1,61 @@
+version: '3'
+
+services:
+  app:
+    image: crystoline/php-laravel
+    build:
+       context: .
+       dockerfile: ./Dockerfile
+    ports:
+      - "9000:80"
+      - "8008:8000"
+
+    volumes:
+      - "./NGPayChoice:/app"
+  
+    #env_file: .env
+
+    links:
+      - mysql_server
+      - redis_server
+      - redis_server_queue
+      - redis_server_session
+
+  mysql_server:
+    image: mysql
+    ports:
+      - "13306:3306"
+    volumes:
+      - "./mysql-data:/var/lib/mysql"
+    #environment:
+      # MYSQL_DATABASE: my-database
+      # MYSQL_USER: crystoline
+      # MYSQL_PASSWORD: mypassword
+      # MYSQL_ROOT_PASSWORD: mypassword
+    env_file: .docker.env
+
+  redis_server:
+    image: redis:alpine
+    ports:
+      - "16300:6379"
+
+  redis_server_queue:
+    image: redis:alpine
+    ports:
+      - "16301:6379"
+
+  redis_server_session:
+    image: redis:alpine
+    ports:
+      - "16302:6379"
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+     - PMA_ARBITRARY=1
+    restart: always
+    ports:
+     - 9009:80
+    volumes:
+     - /pmasessions
+    links:
+      - mysql_server
