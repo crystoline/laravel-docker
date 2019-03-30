@@ -6,7 +6,7 @@ services:
             context: ./
             dockerfile: ./deploy/web.docker
         volumes:
-            - ./project:/var/www
+            - ./project/public:/var/www
         ports:
             - "8080:80"
         links:
