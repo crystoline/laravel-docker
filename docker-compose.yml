@@ -1,35 +1,32 @@
 version: '3'
 
 services:
-   web:
-        build:
-            context: ./
-            dockerfile: ./deploy/web.docker
-        volumes:
-            - ./project/public:/var/www
-        ports:
-            - "8080:80"
-        links:
-            - app
-    app:
-        build:
-            context: ./
-            dockerfile: ./deploy/app.docker
-        volumes:
-            - ./project:/var/www
-        links:
-            - mysql_server
-            - cache
-            - redis_server
-            - redis_server_queue
-            - redis_server_session
-        environment:
-            - "DB_PORT=3306"
-            - "DB_HOST=database"
-            - "REDIS_PORT=6379"
-            - "REDIS_HOST=cache"
+  web:
+    build:
+      context: ./
+      dockerfile: ./deploy/web.docker
+    volumes:
+      - ./project/public:/var/www
+    ports:
+      - "8080:80"
+    links:
+      - app
+  app:
+    build:
+      context: ./
+      dockerfile: ./deploy/app.docker
+    volumes:
+      - ./project:/var/www
+    links:
+      - mysql_server
+      - redis_server
+    environment:
+      - "DB_PORT=3306"
+      - "DB_HOST=database"
+      - "REDIS_PORT=6379"
+      - "REDIS_HOST=cache"
   mysql_server:
-    image: mysql
+    image: mysql:5.6
     ports:
       - "13306:3306"
     volumes:
@@ -40,24 +37,14 @@ services:
     image: redis:alpine
     ports:
       - "16300:6379"
-
-  redis_server_queue:
-    image: redis:alpine
-    ports:
-      - "16301:6379"
-
-  redis_server_session:
-    image: redis:alpine
-    ports:
-      - "16302:6379"
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     environment:
-     - PMA_ARBITRARY=1
+      - PMA_ARBITRARY=1
     restart: always
     ports:
-     - 9009:80
+      - 9009:80
     volumes:
-     - ".pmasessions:/pmasessions"
+      - ".pmasessions:/pmasessions"
     links:
       - mysql_server
